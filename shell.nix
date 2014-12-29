@@ -8,7 +8,7 @@ haskellPackages.cabal.mkDerivation (self: {
   src = ./.;
   isLibrary = true;
   isExecutable = false;
-  buildDepends = with haskellPackages; [ parsec ];
+  buildDepends = with haskellPackages; [ parsec indents ];
   buildTools = with haskellPackages; [ cabalInstall ];
   meta = {
     homepage = "https://github.com/Chobbes/Haithon";
