@@ -6,6 +6,4 @@ A Haskell parser for a subset of the Python language. The intention of this proj
 Grammar
 -------
 
-The grammar is loosely based off of the official Python 3 grammar:
-
-     https://docs.python.org/3/reference/grammar.html
+The grammar is loosely based off of the official Python 3 grammar https://docs.python.org/3/reference/grammar.html
