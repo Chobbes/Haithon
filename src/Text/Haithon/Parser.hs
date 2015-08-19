@@ -30,29 +30,9 @@ import Control.Monad.State
 
 type PyParser a = IndentParser String () a
 
-data PyValue = PyInt Integer | PyDouble Double | PyString String
-
 
 -- | Parser is based loosely off of:
 --
 --     https://docs.python.org/3/reference/grammar.html
 pythonParser :: PyParser ()
 pythonParser = undefined  -- Currently undefined.
-
-
--- | Parse a Python literal value.
-pyValue :: PyParser PyValue
-pyValue = choice [pyInt, pyDouble, pyString]
-
-
-pyInt :: PyParser PyValue
-pyInt = integer >>= return . PyInt
-
-
-pyDouble :: PyParser PyValue
-pyDouble = float >>= return . PyDouble
-
-
-pyString :: PyParser PyValue
-pyString = stringLiteral >>= return . PyString
-

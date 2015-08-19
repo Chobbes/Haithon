@@ -73,7 +73,11 @@ pythonDef = LanguageDef
             , identLetter = alphaNum <|> char '_'
             , opStart = oneOf ":!#$%&*+./<=>?@\\^|-~"
             , opLetter = oneOf  ":!#$%&*+./<=>?@\\^|-~"
-            , reservedOpNames = []
+            , reservedOpNames = [ "*"
+                                , "+"
+                                , "-"
+                                , "**"
+                                ]
             , reservedNames = [ "False"
                               , "class"
                               , "finally"
