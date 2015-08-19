@@ -55,4 +55,4 @@ pyDouble = float >>= return . PyDouble
 
 pyString :: PyParser PyValue
 pyString = stringLiteral >>= return . PyString
-              
+
