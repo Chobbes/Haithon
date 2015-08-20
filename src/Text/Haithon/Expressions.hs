@@ -45,12 +45,16 @@ data PyExpr = PyPow PyExpr PyExpr
             deriving (Show)
 
 
+pyExpr :: PyParser PyExpr
 pyExpr = buildExpressionParser table term
 
+
+term :: PyParser PyExpr
 term = parens pyExpr
        <|> (fmap (either PyInt PyDouble) naturalOrFloat)
        <|> (stringLiteral >>= return . PyString)
        <|> (identifier >>= return . PyIdentifier)
+
 
 -- | https://hackage.haskell.org/package/parsec-3.1.9/docs/Text-Parsec-Expr.html
 -- is pretty much exactly what we need here.
@@ -60,6 +64,7 @@ table = [ [binary "**" (PyPow) AssocLeft]
         , [binary "*" (PyMult) AssocLeft, binary "/" (PyDiv) AssocLeft]
         , [binary "+" (PyPlus) AssocLeft, binary "-" (PySub) AssocLeft]
         ]
+
 
 binary  name fun assoc = Infix (do { reservedOp name; return fun }) assoc
 prefix  name fun       = Prefix (do { reservedOp name; return fun })
