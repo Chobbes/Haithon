@@ -26,9 +26,7 @@ module Text.Haithon.Parser where
 import Text.Haithon.Expressions
 import Text.Haithon.ParserTypes
 import Text.Haithon.Tokens
-import Text.Parsec hiding (State)
-import Text.Parsec.Indent
-import Control.Monad.State
+import Text.Parsec
 
 
 -- | Parser is based loosely off of:
@@ -47,8 +45,33 @@ data PySimpleStmt = PyAssign String PyExpr -- Python assignments are more compli
                   deriving (Show)
 
 
+pySimpleStmtLine :: PyParser [PySimpleStmt]
+pySimpleStmtLine = flip sepBy1 (reservedOp ";")
+                   $ choice [ pyAssign
+                            , pyBreak
+                            , pyContinue
+                            , pyReturn
+                            ]
+
+
 pyAssign :: PyParser PySimpleStmt
 pyAssign = do assign <- identifier
               reservedOp "="
               value <- pyExpr
               return $ PyAssign assign value
+
+
+pyBreak :: PyParser PySimpleStmt
+pyBreak = reserved "break" >> return PyBreak
+
+
+pyContinue :: PyParser PySimpleStmt
+pyContinue = reserved "continue" >> return PyContinue
+
+
+pyReturn :: PyParser PySimpleStmt
+pyReturn = do reserved "return"
+              expr <- pyExpr
+              return $ PyReturn expr
+
+
