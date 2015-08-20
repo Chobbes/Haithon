@@ -23,8 +23,8 @@
 
 module Text.Haithon.Expressions where
 
+import Text.Haithon.ParserTypes
 import Text.Haithon.Tokens
-import Text.Haithon.Parser
 import Text.Parsec hiding (State)
 import Text.Parsec.Expr
 import Control.Monad.State as S

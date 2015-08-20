@@ -21,34 +21,10 @@
    SOFTWARE.
 -}
 
-module Text.Haithon.Parser where
+module Text.Haithon.ParserTypes where
 
-import Text.Haithon.Expressions
-import Text.Haithon.ParserTypes
-import Text.Haithon.Tokens
-import Text.Parsec hiding (State)
 import Text.Parsec.Indent
-import Control.Monad.State
 
 
--- | Parser is based loosely off of:
---
---     https://docs.python.org/3/reference/grammar.html
-pythonParser :: PyParser ()
-pythonParser = undefined  -- Currently undefined.
+type PyParser a = IndentParser String () a
 
-
--- | Simple Python statements.
-data PySimpleStmt = PyAssign String PyExpr -- Python assignments are more complicated than this.
-                  | PyPass
-                  | PyBreak
-                  | PyContinue
-                  | PyReturn PyExpr
-                  deriving (Show)
-
-
-pyAssign :: PyParser PySimpleStmt
-pyAssign = do assign <- identifier
-              reservedOp "="
-              value <- pyExpr
-              return $ PyAssign assign value
