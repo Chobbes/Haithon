@@ -1,4 +1,4 @@
-{- Copyright (C) 2014 Calvin Beck
+{- Copyright (C) 2015 Calvin Beck
 
    Permission is hereby granted, free of charge, to any person
    obtaining a copy of this software and associated documentation files
@@ -61,7 +61,7 @@ commaSep = T.commaSep pyTokenParser
 commaSep1 = T.commaSep1 pyTokenParser
 
 
-pyTokenParser = makeTokenParser pythonDef
+pyTokenParser = makeTokenParser' (`elem` [' ', '\t'])  pythonDef
 
 pythonDef :: GenLanguageDef String st (S.State SourcePos)
 pythonDef = LanguageDef

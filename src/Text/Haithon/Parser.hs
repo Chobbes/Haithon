@@ -1,4 +1,4 @@
-{- Copyright (C) 2014 Calvin Beck
+{- Copyright (C) 2015 Calvin Beck
 
    Permission is hereby granted, free of charge, to any person
    obtaining a copy of this software and associated documentation files
@@ -21,12 +21,15 @@
    SOFTWARE.
 -}
 
+{-# LANGUAGE FlexibleContexts #-}
+
 module Text.Haithon.Parser where
 
 import Text.Haithon.Expressions
 import Text.Haithon.ParserTypes
 import Text.Haithon.Tokens
 import Text.Parsec
+import Text.Parsec.Indent
 
 
 -- | Parser is based loosely off of:
@@ -36,42 +39,71 @@ pythonParser :: PyParser ()
 pythonParser = undefined  -- Currently undefined.
 
 
--- | Simple Python statements.
-data PySimpleStmt = PyAssign String PyExpr -- Python assignments are more complicated than this.
-                  | PyPass
-                  | PyBreak
-                  | PyContinue
-                  | PyReturn PyExpr
-                  deriving (Show)
+-- | Python statements.
+data PyStmt = PyAssign String PyExpr -- Python assignments are more complicated than this.
+            | PyPass
+            | PyBreak
+            | PyContinue
+            | PyReturn PyExpr
+            | PyIf PyExpr [PyStmt]
+            deriving (Show, Eq)
 
 
-pySimpleStmtLine :: PyParser [PySimpleStmt]
-pySimpleStmtLine = flip sepBy1 (reservedOp ";")
-                   $ choice [ pyAssign
-                            , pyBreak
-                            , pyContinue
-                            , pyReturn
-                            ]
+pyNextLine :: PyParser ()
+pyNextLine = many1 (lexeme newline) >> return ()
 
 
-pyAssign :: PyParser PySimpleStmt
+pySimpleStmtLine :: PyParser [PyStmt]
+pySimpleStmtLine = do s <- flip sepBy1 (many1 $ reservedOp ";")
+                           $ choice [ pyAssign
+                                    , pyBreak
+                                    , pyContinue
+                                    , pyReturn
+                                    ]
+                      pyNextLine <|> eof
+                      return s
+
+
+pyAssign :: PyParser PyStmt
 pyAssign = do assign <- identifier
               reservedOp "="
               value <- pyExpr
               return $ PyAssign assign value
 
 
-pyBreak :: PyParser PySimpleStmt
+pyBreak :: PyParser PyStmt
 pyBreak = reserved "break" >> return PyBreak
 
 
-pyContinue :: PyParser PySimpleStmt
+pyContinue :: PyParser PyStmt
 pyContinue = reserved "continue" >> return PyContinue
 
 
-pyReturn :: PyParser PySimpleStmt
+pyReturn :: PyParser PyStmt
 pyReturn = do reserved "return"
               expr <- pyExpr
               return $ PyReturn expr
 
 
+pyIf :: PyParser PyStmt
+pyIf = pyBlock PyIf pyIfTest pySuite
+
+
+pyIfTest :: PyParser PyExpr
+pyIfTest = do reserved "if"
+              value <- pyExpr
+              reservedOp ":"
+              return value
+
+
+pySuite :: PyParser [PyStmt]
+pySuite = try pySimpleStmtLine
+          <|> do pyNextLine
+                 s <- block pySimpleStmtLine
+                 return $ concat s
+
+
+pyBlock f a b = withPos $ do
+  resA <- a
+  resB <- indented >> pySuite
+  return $ f resA resB

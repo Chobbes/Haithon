@@ -1,4 +1,4 @@
-{- Copyright (C) 2014 Calvin Beck
+{- Copyright (C) 2015 Calvin Beck
 
    Permission is hereby granted, free of charge, to any person
    obtaining a copy of this software and associated documentation files
@@ -42,7 +42,7 @@ data PyExpr = PyPow PyExpr PyExpr
             | PyDouble Double
             | PyString String
             | PyIdentifier String
-            deriving (Show)
+            deriving (Show, Eq)
 
 
 pyExpr :: PyParser PyExpr
